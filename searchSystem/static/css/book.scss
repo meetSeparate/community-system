@@ -1,0 +1,202 @@
+@font-face {
+  font-family: 'Smile Font';
+  font-style: normal;
+  font-display: swap;
+  src: url('/static/font/SmileySans-Oblique.ttf');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  font-family: "Smile Font";
+  //color: #333;
+}
+
+a {
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+
+}
+
+#app, html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #f4f4f5;
+}
+
+.nav {
+  width: 100%;
+  box-shadow: 0 0 20px -5px rgba(158, 158, 158, 0.22);
+  background-color: white;
+}
+
+.main {
+  width: 100%;
+  //height: 1200px;
+  margin-top: 40px;
+
+  .container {
+    background-color: white;
+    //height: 100%;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .date {
+      margin-right: 20px;
+    }
+  }
+
+  .content {
+    margin-top: 30px;
+
+    p {
+      line-height: 3;
+      text-indent: 2rem;
+    }
+  }
+
+}
+
+.comment {
+  margin-top: 20px;
+  .container {
+    background-color: #fff;
+  }
+
+  .comment_title {
+    margin-top: 40px;
+    font-weight: 500;
+    font-size: 24px;
+    color: #303133;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid #ebeef5;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+  }
+
+  .input {
+    width: 100%;
+    border: 1px solid #f4f4f5;
+    resize: none;
+    vertical-align: middle;
+    color: #606266;
+    background: transparent;
+    border-radius: 6px 0 6px 6px;
+    //background: #f2f6fc;
+    padding: 15px;
+  }
+
+  .btn {
+    position: relative;
+    left: 500px;
+    margin-top: 10px;
+  }
+
+  .comment_list {
+    margin-top: 20px;
+
+    li {
+      margin-top: 20px;
+
+      .content {
+        margin-top: 20px;
+        border-top: 1px solid #ebeef5;
+        width: 100%;
+        height: 80px;
+        padding: 20px;
+        box-shadow: 0 0 20px -5px rgba(158, 158, 158, 0.22);
+      }
+    }
+  }
+}
+
+.image {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 80%;
+    height: 400px;
+  }
+}
+
+.article_agree {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+
+    .agree {
+      text-align: center;
+      font-size: 12px;
+      color: #909399;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+
+      .digg_icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #f56c6c;
+        cursor: pointer;
+        margin-bottom: 8px;
+
+        svg {
+          position: absolute;
+          width: 28px;
+          height: 28px;
+          transform: scale(0);
+          opacity: 0;
+          transition: transform 0.85s, opacity 0.85s, -webkit-transform 0.85s;
+        }
+
+        svg.active {
+          transform: scale(1);
+          opacity: 1;
+        }
+
+        .icon- {
+          font-family: 'icomoon', serif !important;
+          font-style: normal;
+          font-variant: normal;
+          font-weight: normal;
+          line-height: 1;
+          speak: none;
+          text-transform: none;
+          color: var(--theme);
+        }
+      }
+
+      .icon.active {
+        animation: box_shadow 1s;
+        box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+      }
+    }
+  }

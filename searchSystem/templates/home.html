@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>首页</title>
+    <link rel="stylesheet" href="/static/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/home.css">
+    {% block style %}
+
+    {% endblock %}
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>
+            <div class="header">
+                <h1 style="color: #fff">文章数据分析系统</h1>
+                <div class="user">
+                    {% if request.user.username %}
+                        <el-dropdown>
+                            <span class="el-dropdown-link" style="color: #fff">
+                                {{ request.user.username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                            </span>
+                            <el-dropdown-menu slot="dropdown">
+                                {% if request.user.is_superuser %}
+                                    <el-dropdown-item icon="el-icon-user"><a href="/admin">后台管理</a>
+                                    </el-dropdown-item>
+                                {% endif %}
+
+                                <el-dropdown-item icon="el-icon-switch-button"><a href="/logout">退出登录</a>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    {% else %}
+                        <i class="el-icon-user"></i>
+                        <a href="/">登录</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </el-header>
+        <el-container>
+            <el-aside width="200px">
+                <el-menu
+                        default-active="2"
+                        class="el-menu-vertical-demo">
+
+                    {% if not user_info.name %}
+                        <el-menu-item index="0">
+                            <i class="el-icon-setting"></i>
+                            <a href="/user"><span slot="title">个人信息录入</span></a>
+                        </el-menu-item>
+                    {% endif %}
+
+                    {% if user_info.name %}
+                        <el-menu-item index="1">
+                            <i class="el-icon-setting"></i>
+                            <a href="/userinfo"><span slot="title">个人信息展示</span></a>
+                        </el-menu-item>
+                    {% endif %}
+
+                    <el-menu-item index="2">
+                        <i class="el-icon-shopping-cart-1"></i>
+                        <span slot="title"><a href="/home">数据展示</a></span>
+                    </el-menu-item>
+
+{#                    <el-menu-item index="3">#}
+{#                        <i class="el-icon-shopping-cart-1"></i>#}
+{#                        <span slot="title"><a href="/time">时间统计</a></span>#}
+{#                    </el-menu-item>#}
+
+                </el-menu>
+            </el-aside>
+            <el-container>
+                <el-main>
+                    {% csrf_token %}
+                    {% block container %}
+                        <el-table
+                                :data="tableList"
+                                stripe
+                                style="width: 100%">
+                            <el-table-column
+                                    prop="id"
+                                    label="id">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="title"
+                                    label="标题">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="author"
+                                    label="作者">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="organ"
+                                    label="学院">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="source"
+                                    label="来源">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="keywords"
+                                    label="关键词">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="pub_time"
+                                    label="时间">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="first_duty"
+                                    label="一作">
+                            </el-table-column>
+                        </el-table>
+
+                        <el-pagination
+                                background
+                                layout="prev, pager, next"
+                                :total="config.total"
+                                :page-size="config.limit"
+                                @current-change="changePage">
+                        </el-pagination>
+
+                    {% endblock %}
+                </el-main>
+                <el-footer><h1 style="color: #fff">欢迎来到文章数据分析系统</h1></el-footer>
+            </el-container>
+        </el-container>
+    </el-container>
+</div>
+<script src="/static/vue/vue.js"></script>
+<script src="/static/elementui/index.js"></script>
+<script src="/static/axios/axios.min.js"></script>
+<script src="/static/echarts/echarts.js"></script>
+{% block js %}
+{% endblock %}
+<script>
+    axios.interceptors.request.use(
+        request => {
+            if (request.method === 'post') {
+                let csrf_token = document.querySelector('input[name = "csrfmiddlewaretoken"]').value
+                request.headers['X-CSRFToken'] = csrf_token
+            }
+            return request
+        },
+    )
+    axios.interceptors.response.use(
+        response => {
+            return response.data
+        }
+    )
+
+    new Vue({
+        el: '#app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                searchText: '',
+                img_src: '/static/img/data词云图.png',
+                index: false,
+                tableList: [],
+                config: {
+                    total: 10,
+                    page: 1,
+                    limit: 7,
+                }
+            }
+        },
+
+        mounted() {
+            if (location.href.indexOf('home') !== -1) {
+                this.getTableData()
+            }
+        },
+
+        methods: {
+            searchButton() {
+                axios.post('/api/jingdongShop/', {value: this.searchText}).then(res => {
+                    console.log(res)
+                    this.index = true
+                })
+            },
+
+            getTableData() {
+                axios({
+                    url: '/api/article/',
+                    method: 'get',
+                    params: this.config,
+                }).then(res => {
+                    this.config.total = res.total
+                    this.tableList = res.data
+                })
+            },
+
+            changePage(page) {
+                this.config.page = page
+                this.getTableData()
+            }
+        }
+    })
+</script>
+</body>
+</html>
+
+{% block script %}
+
+{% endblock %}

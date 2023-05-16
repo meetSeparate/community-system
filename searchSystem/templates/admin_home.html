@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>后台看板</title>
+    <link rel="stylesheet" href="/static/css/admin_home.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+<div id="app">
+    <!--    <h2>控制台</h2>-->
+    <!--    <p>用于展示当前系统中的统计数据，统计表及重要实时数据</p>-->
+    <div class="actions">
+        <span :class="menu === 'home' ? 'active item' : 'item'" @click="set_menu('home')">首页</span>
+        <span :class="menu === 'month' ? 'active item' : 'item'" @click="set_menu('month')">月份统计</span>
+        <span :class="menu === 'source' ? 'active item' : 'item'" @click="set_menu('source')">数据来源统计</span>
+        <span :class="menu === 'keyword' ? 'active item' : 'item'" @click="set_menu('keyword')">关键词统计</span>
+        <span :class="menu === 'author' ? 'active item' : 'item'" @click="set_menu('author')">作者数据分析</span>
+    </div>
+
+    <main class="home" v-show="menu==='home'">
+        <div class="title">
+            <div class="item tea">
+                <div class="left">
+                    <i class="fa fa-user-circle-o"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ user_count }}</h3>
+                    <p>用户总数</p>
+                </div>
+            </div>
+            <div class="item yellow">
+                <div class="left">
+                    <i class="fa fa-cutlery"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ job_count }}</h3>
+                    <p>数据总数</p>
+                </div>
+            </div>
+            <div class="item red">
+                <div class="left">
+                    <i class="fa fa-internet-explorer"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ comment_count }}</h3>
+                    <p>数据表数</p>
+                </div>
+            </div>
+            <div class="item green">
+                <div class="left">
+                    <i class="fa fa-handshake-o"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ apply_job_count }}</h3>
+                    <p>图表总数</p>
+                </div>
+            </div>
+            <div class="item blue">
+                <div class="left">
+                    <i class="fa fa-pinterest-square"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ signup_count }}</h3>
+                    <p>主题总数</p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="charts" id="main">
+
+            </div>
+            <div class="data_s">
+                <div class="item">
+                    <span class="new">实时</span>
+                    <div class="left">
+                        <i class="fa fa-odnoklassniki-square"></i>
+                    </div>
+                    <div class="right">
+                        <h4>{{ online_count }}</h4>
+                        <p>在线人数</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="left">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="right">
+                        <h4>{{ today_sign }}</h4>
+                        <p>今日注册</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="left">
+                        <i class="fa fa-envelope"></i>
+                    </div>
+                    <div class="right">
+                        <h4>{{ today_job }}</h4>
+                        <p>今日数据</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="title">
+                每日一诗
+            </div>
+            <div class="body">
+                [[ poetry.content ]]
+            </div>
+            <div class="info">
+                [[ poetry.info ]]
+            </div>
+            <div class="in_word">
+                <button :class="btn_status ? '' : 'no_active'" @click="reset_word">换一句</button>
+            </div>
+        </div>
+    </main>
+
+    <main class="version" v-show="menu==='month'">
+        <div class="title">
+            <span>文章数据分析系统</span>
+            <span>月份统计</span>
+        </div>
+        <div class="content">
+            <div class="charts" id="main1" style="height: 370px; margin-top: 20px">
+
+            </div>
+        </div>
+    </main>
+
+    <main class="version" v-show="menu==='keyword'">
+        <div class="title">
+            <span>文章数据分析系统</span>
+            <span>关键词统计</span>
+        </div>
+        <div class="content">
+            <div class="charts" id="main2" style="height: 370px; margin-top: 20px">
+
+            </div>
+        </div>
+    </main>
+
+    <main class="version" v-show="menu==='source'">
+        <div class="title">
+            <span>文章数据分析系统</span>
+            <span>数据来源统计</span>
+        </div>
+        <div class="content">
+            <div class="charts" id="main3" style="height: 370px; margin-top: 20px">
+
+            </div>
+        </div>
+    </main>
+
+    <main class="version" v-show="menu==='author'">
+        <div class="title">
+            <span>文章数据分析系统</span>
+            <span>作者数据分析</span>
+        </div>
+        <div class="content">
+            <div class="charts" id="main4" style="height: 370px; margin-top: 20px">
+
+            </div>
+        </div>
+    </main>
+
+</div>
+<script src="/static/vue/vue.js"></script>
+<script src="/static/echarts/echarts.js"></script>
+<script src="/static/utils/poetry.js" charset="utf-8"></script>
+<script src="/static/jquery/jquery.min.js"></script>
+
+<script>
+    function randomNum(minNum, maxNum) {
+        switch (arguments.length) {
+            case 1:
+                return parseInt(Math.random() * minNum + 1, 10);
+                break;
+            case 2:
+                return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+
+    function init_echarts_user(seven_data) {
+        // -----------  echarts 配置 ----------- //
+
+        let chartDom = document.getElementById('main');
+        let myChart = echarts.init(chartDom);
+        let option;
+        // 配置信息
+        option = {
+            title: {
+                text: '七日用户活跃'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data: ['登录', '注册']
+            },
+            toolbox: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: seven_data['date']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            // 数据可以从后端去请求
+            series: [
+                {
+                    name: '登录',
+                    type: 'line',
+                    stack: 'Total',
+                    areaStyle: {},
+                    smooth: true,//设置折线图平滑
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: seven_data['login_data']
+                },
+                {
+                    name: '注册',
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,//设置折线图平滑
+                    areaStyle: {},
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: seven_data['sign_data']
+                },
+            ]
+        };
+        //根据浏览器的大小来改变大小
+        window.onresize = () => {
+            myChart.resize();
+        }
+        option && myChart.setOption(option);
+    }
+
+    function init_keyword(data) {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main2'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            series: [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '55%',
+                    data: data,
+                    roseType: 'angle',
+                    itemStyle: {
+                        normal: {
+                            shadowBlur: 200,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    }
+
+    // 对数据月份统计
+    function init_echarts_month(order_data) {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main1'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '月份统计'
+            },
+            tooltip: {},
+            legend: {
+                data: ['数量']
+            },
+            xAxis: {
+                data: order_data['name']
+            },
+            yAxis: {},
+            series: [{
+                name: '数量',
+                type: 'bar',
+                data: order_data['number']
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    }
+
+    function init_echarts_source(order_data) {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main3'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '来源统计'
+            },
+            tooltip: {},
+            legend: {
+                data: ['数量']
+            },
+            xAxis: {
+                data: order_data['name'],
+                axisLabel: {
+                    rotate: 60,
+                    interval: 0
+                },
+            },
+            yAxis: {},
+            series: [{
+                name: '数量',
+                type: 'bar',
+                data: order_data['number']
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    }
+
+    function init_echarts_author(order_data) {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main4'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '作者数据分析'
+            },
+            tooltip: {},
+            legend: {
+                data: ['数量']
+            },
+            xAxis: {
+                data: order_data['name'],
+                axisLabel: {
+                    rotate: 60,
+                    interval: 0
+                },
+            },
+            yAxis: {},
+            series: [{
+                name: '数量',
+                type: 'bar',
+                data: order_data['number']
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    }
+
+
+    // 获取七日登录注册数据
+    function init_seven_data() {
+        $.get('/api/get_seven_data', (res) => {
+            init_echarts_user(res)
+        })
+    }
+
+    function init_time_data() {
+        $.get('/api/get_time_data', (res) => {
+            init_echarts_month(res)
+        })
+    }
+
+    function init_keyword_data() {
+        $.get('/api/get_keyword_data', (res) => {
+            init_keyword(res.data)
+        })
+    }
+
+    function init_source_data() {
+        $.get('/api/get_source_data', (res) => {
+            init_echarts_source(res)
+        })
+    }
+
+    function init_author_data() {
+        $.get('/api/get_author_data', (res) => {
+            init_echarts_author(res)
+        })
+    }
+
+
+    let timer = null;
+    new Vue({
+        el: '#app',
+        delimiters: ["[[", "]]"],
+        data: {
+            // 当前菜单
+            menu: 'home',
+            // 诗句
+            poetry: {
+                // 内容
+                content: '',
+                // 作者
+                info: '',
+            },
+            // 按钮是否可点击
+            btn_status: true,
+            // 获取时间距离现在的时间 几天前
+            getDateDiff(date) {
+                let dateTimeStamp = new Date(date).getTime()
+                let result = ''
+                let minute = 1000 * 60
+                let hour = minute * 60
+                let day = hour * 24
+                let month = day * 30
+                let now = new Date().getTime()
+                let diffValue = now - dateTimeStamp
+                if (diffValue < 0) return
+                let monthC = diffValue / month
+                let weekC = diffValue / (7 * day)
+                let dayC = diffValue / day
+                let hourC = diffValue / hour
+                let minC = diffValue / minute
+                if (monthC >= 1) {
+                    result = "" + parseInt(monthC) + "个月前"
+                } else if (weekC >= 1) {
+                    result = "" + parseInt(weekC) + "周前"
+                } else if (dayC >= 1) {
+                    result = "" + parseInt(dayC) + "天前"
+                } else if (hourC >= 1) {
+                    result = "" + parseInt(hourC) + "小时前"
+                } else if (minC >= 1) {
+                    result = "" + parseInt(minC) + "分钟前"
+                } else {
+                    result = "刚刚"
+                }
+                return result
+            },
+
+            online_count: 1,
+        },
+        created() {
+            // 调用诗句
+            this.reset_word()
+            // 初始化菜单选项
+            this.init_menu()
+        },
+        methods: {
+            // 初始化获取菜单
+            init_menu() {
+                let menu = localStorage.getItem('menu')
+                // 如果是home标签页，就去获取在线人数
+                if (menu === 'home') {
+                    this.init_online()
+                }
+                // 取出menu
+                if (menu) {
+                    this.menu = menu
+                }
+            },
+            // 选择菜单
+            set_menu(menu) {
+                this.menu = menu
+                if (menu === 'home') {
+                    // 如果是在其他页面，home里面的echarts的长度就有问题，需要重新去计算
+                    setTimeout(() => {
+                        myChart.resize()
+                    }, 200)
+                    // 获取在线人数
+                    this.init_online()
+                } else {
+                    // 清除这个获取在线人数的定时器
+                    clearInterval(timer)
+                }
+                // 设置进本地存储
+                localStorage.setItem('menu', menu)
+                location.reload()
+            },
+            // 获取每日诗句
+            reset_word() {
+                if (this.btn_status) {
+                    this.btn_status = false
+                    jinrishici.load((result) => {
+                        let poem = result.data.content;
+                        let info = "【" + result.data.origin.dynasty + "】" + result.data.origin.author + "《" + result.data.origin.title + "》";
+                        this.poetry.content = poem
+                        this.poetry.info = info
+                    })
+                }
+                setTimeout(() => {
+                    // 按下按钮需要4秒后才能点下一个
+                    this.btn_status = true
+                }, 4000)
+            },
+            // 获取在线人数
+            get_online() {
+                // 调用后台的地址
+                this.online_count = randomNum(1, 23)
+            },
+            // 初始化在线人数
+            init_online() {
+                // 需要先调用一次这个方法
+                this.get_online()
+                timer = setInterval(this.get_online, 1000)
+            }
+        },
+    })
+
+    init_seven_data()
+    init_time_data()
+    init_keyword_data()
+    init_source_data()
+    init_author_data()
+</script>
+</body>
+</html>

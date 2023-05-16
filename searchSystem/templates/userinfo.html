@@ -1,0 +1,49 @@
+{% extends 'home.html' %}
+
+{% block container %}
+    <el-descriptions class="margin-top" title="个人信息展示" :column="2" border>
+        <el-descriptions-item>
+            <template slot="label">
+                <i class="el-icon-user"></i>
+                用户名
+            </template>
+            {{ request.user.username }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+            <template slot="label">
+                <i class="el-icon-mobile-phone"></i>
+                姓名
+            </template>
+            {{ user_info.name }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+            <template slot="label">
+                <i class="el-icon-location-outline"></i>
+                性别
+            </template>
+            {{ user_info.sex }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+            <template slot="label">
+                <i class="el-icon-office-building"></i>
+                年龄
+            </template>
+            {{ user_info.age }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+            <template slot="label">
+                <i class="el-icon-office-building"></i>
+                手机号
+            </template>
+            {{ user_info.tel }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+            <template slot="label">
+                <i class="el-icon-office-building"></i>
+                用户角色
+            </template>
+            {{ user_info.role }}
+        </el-descriptions-item>
+
+    </el-descriptions>
+{% endblock %}
